@@ -34,8 +34,8 @@
 		"exec": "npx nodemon -r dotenv/config",
 		"watch:compile": "npx tsc -w",
 		"watch:build": "npx nodemon -r dotenv/config ./dist/server.js",
-		"clean": "rm -rf node_modules & yarn run clear",
-		"dev": "yarn run watch:compile & yarn run watch:build"
+		"clean": "rm -rf node_modules && yarn run clear",
+		"dev": "yarn run compile && (yarn run watch:compile & yarn run watch:build)"
 	},
 	"nodemonConfig": {
 		"ignore": [

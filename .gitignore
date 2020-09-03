@@ -1,5 +1,7 @@
 # Directory
 node_modules/
+dist/
+.next/
 # 
 *.pgsql
 yarn-*

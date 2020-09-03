@@ -1,12 +1,37 @@
 import { useReducer } from 'react';
-import { PlainObject } from '../types';
+import { PlainObject } from '../_types';
 
-// Form field object
+// THERE ARE PLANS TO IMPROVED THIS MODULE
+
+//
+// ---------------------------Types--------------------------- //
+//
+// Type for each form field
+type FormFieldOption = {
+	name: string;
+	value: string | number;
+	type: 'text' | 'email' | 'password' | 'submit' | 'radio' | 'checkbox';
+	label?: string;
+	group?: string;
+	choices?: ({ label: string; value: string | number } | string | number)[];
+	inlineLable?: boolean;
+	className?: string;
+	hidden?: boolean;
+	placeholder?: string;
+	required?: boolean;
+	autocomplete?: boolean;
+};
+
+// Form field template
 export type FormTemplateOption = {
 	[formField: string]: FormFieldOption;
 };
-
-// Form Hook
+//
+// ------------------------------------FORM HOOK------------------------------------
+//
+// Custom useForm hook. Return a rendered form component and current form value object
+// The rendered form component handles its own state change events.
+// The returned value object contain current input values of the form.
 export const useForm = (
 	formTemplate: FormTemplateOption,
 	onSubmit?: (formValues?: PlainObject) => void
@@ -36,41 +61,22 @@ export const useForm = (
 	const Form = generateForm(formTemplate, formValues, changeHandler, submitHandler);
 	return [Form, formValues];
 };
-
 //
+// ---------------------------SUPPORTED FORM INPUT TYPE---------------------------
 //
-// --------------------------- MODULE Types --------------------------- //
-//
-
-// Type for form component declaration
-type FormFieldOption = {
-	name: string;
-	value: string | number;
-	type: 'text' | 'email' | 'password' | 'submit' | 'radio' | 'checkbox';
-	label?: string;
-	group?: string;
-	choices?: ({ label: string; value: string | number } | string | number)[];
-	inlineLable?: boolean;
-	className?: string;
-	hidden?: boolean;
-	placeholder?: string;
-	required?: boolean;
-	autocomplete?: boolean;
-};
-
 // Generic form component
 interface FormField {
 	// basic form field
 	name: string;
 	label?: string;
 }
-
+//
 // Basic form input type
 export interface BasicFormField extends FormField {
 	value: string;
 	type: 'text' | 'email' | 'password' | 'submit';
 }
-
+//
 // Choose-one form input type
 export interface ChooseOneFormField extends FormField {
 	group: string;
@@ -157,10 +163,11 @@ const BasicInput = (props: { option: FormFieldOption; value: any; handleChange: 
 	const option = props.option;
 	const formComponent = (
 		<>
-			{' '}
 			{option.label ? (
 				<>
-					<label htmlFor={option.name} style={option.inlineLable ? { marginRight: '.5em' } : {}}>
+					<label
+						htmlFor={option.name}
+						style={option.inlineLable ? { marginRight: '.5em' } : {}}>
 						{option.label}
 					</label>
 					{option.inlineLable ? null : <br />}
@@ -174,8 +181,14 @@ const BasicInput = (props: { option: FormFieldOption; value: any; handleChange: 
 				tabIndex={option.hidden ? -1 : 0}
 				placeholder={option.placeholder}
 				required={option.required}
-				autoComplete={option.autocomplete ? 'on' : 'off'}
-			/>{' '}
+				autoComplete={
+					option.autocomplete === true
+						? 'on'
+						: option.autocomplete === false
+						? 'off'
+						: 'on'
+				}
+			/>
 		</>
 	);
 	return (

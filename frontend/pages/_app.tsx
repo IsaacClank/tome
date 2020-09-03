@@ -1,22 +1,30 @@
 import React from 'react';
-import NavBar from 'components/NavBar';
-import AuthContext from 'lib/contexts/AuthContext';
 import { AppProps } from 'next/app';
-// Env variables
-import { SERVER, USER_API_INFO } from 'lib/constants';
-// Style imports
-import 'styles/globals.scss';
+// JSX imports
+import NavBar from 'components/navbar';
+// Env imports
+import { SERVER_HOST, AUTH_API } from 'lib/_config';
+// Hook & context imports
+import AuthContext from 'lib/contexts/authContext';
+import useFetch from 'lib/hooks/useFetch';
 
+import 'styles/globals.scss'; // Style imports
+
+// Custom App componebnt
 const App = (props: AppProps) => {
+	// Authentication context initializing logic
+	// Very bad code. Will be fixed soon
 	const [Auth, setAuth] = React.useState(false);
-
+	const { fetchState } = useFetch(`${SERVER_HOST}${AUTH_API}`, { credentials: 'include' }, true);
 	React.useEffect(() => {
-		fetch(`${SERVER}${USER_API_INFO}`, { credentials: 'include' })
-			.then(res => res.json())
-			.then(res => (res.error ? Promise.reject(res.error) : setAuth(res.payload?.authenticated)))
-			.catch(err => console.error(err));
-	}, [Auth]);
+		if (fetchState?.status === 'RECEIVED') setAuth(fetchState.data.authenticated);
 
+		if (fetchState?.status === 'ERROR') console.error(fetchState.error);
+	}, [fetchState]);
+	//
+
+	// App has layout has a fixed navigation bar on top. Page content is rendered below.
+	// App use an Authentication context for checking authenticated state. Will possibly be replaced by a different solution
 	return (
 		<div id='App'>
 			<AuthContext.Provider value={{ authenticated: Auth, changeAuthState: setAuth }}>

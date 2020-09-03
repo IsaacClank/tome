@@ -52,7 +52,6 @@ const updateSession = (req: Request, res: Response, next: NextFunction) => {
 			authenticated: req.session?.user ? true : false,
 		});
 	}
-	console.log(req.session);
 	return next();
 };
 

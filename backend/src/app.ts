@@ -4,11 +4,11 @@ import AuthRouter from './routes/auth';
 import LibROuter from './routes/lib';
 import SessionManager from './services/session';
 import { ServerResponse } from './_types';
-import cors from 'cors';
+import Cors from './services/cors';
 
 const App = express();
 
-App.use(cors());
+App.use(Cors);
 App.use(SessionManager);
 App.use(express.json());
 App.use(express.urlencoded({ extended: false }));

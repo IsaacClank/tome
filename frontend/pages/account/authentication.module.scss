@@ -1,23 +1,19 @@
 @import 'styles/variables';
 
-#App {
-	background-color: black;
-}
-
 #Content {
-	overflow: auto;
-	height: 100%;
 	font-family: 'Fira Sans';
-	// background-color: adjust-color($color: $palette-base-2, $saturation: -100, $lightness: -70%, $alpha: 1);
+	padding-top: 5em;
+	height: 100%;
 	background-color: darken($color: $palette-base-3, $amount: 30);
-	background-size: cover;
+	overflow: inherit;
+
 	& > div > div {
 		justify-content: center;
 	}
 
 	#FormWrapper {
 		padding: 0px 35%;
-		margin-top: 5em;
+		margin-top: 2em;
 
 		#AuthenticationForm {
 			background-color: $palette-base-2;

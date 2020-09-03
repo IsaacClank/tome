@@ -22,3 +22,6 @@ export const GB_API_KEY = process.env.GB_API_KEY;
 export const SG_USER = process.env.SG_USER;
 export const SG_PASSWORD = process.env.SG_PASSWORD;
 export const SG_FROM = process.env.SG_FROM;
+
+// next host
+export const NEXT_HOST = process.env.NEXT_HOST;
