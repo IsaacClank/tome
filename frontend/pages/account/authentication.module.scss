@@ -1,0 +1,97 @@
+@import 'styles/variables';
+
+#App {
+	background-color: black;
+}
+
+#Content {
+	overflow: auto;
+	height: 100%;
+	font-family: 'Fira Sans';
+	// background-color: adjust-color($color: $palette-base-2, $saturation: -100, $lightness: -70%, $alpha: 1);
+	background-color: darken($color: $palette-base-3, $amount: 30);
+	background-size: cover;
+	& > div > div {
+		justify-content: center;
+	}
+
+	#FormWrapper {
+		padding: 0px 35%;
+		margin-top: 5em;
+
+		#AuthenticationForm {
+			background-color: $palette-base-2;
+			padding: 2.5em 3em 1.5em 3em;
+			border-radius: 1em;
+
+			#AuthSwitcher {
+				display: flex;
+				justify-content: center;
+				button {
+					background-color: transparent;
+					width: 5em;
+					border: 0px solid $palette-base-3;
+					border-radius: 0px;
+					box-shadow: none;
+					color: lighten($color: black, $amount: 40);
+					font-size: 1.1rem;
+
+					&.selected {
+						color: black;
+						font-weight: 500;
+						border-bottom: 3px solid $palette-base-3;
+					}
+				}
+			}
+
+			form {
+				margin-top: 2.5em;
+				input {
+					margin-bottom: 1em;
+				}
+				input[type='email'],
+				input[type='text'],
+				input[type='password'] {
+					width: 100%;
+					height: 3em;
+					padding: 1em 1em;
+					border-style: none;
+					background-color: darken($color: white, $amount: 10);
+					box-shadow: 0px 0.5px 2px;
+				}
+				& > div:nth-last-child(1) {
+					margin-top: 1em;
+					display: flex;
+					justify-content: center;
+
+					& > input {
+						@keyframes submitHover {
+							from {
+								background-color: $palette-base-3;
+							}
+							to {
+								background-color: lighten($color: $palette-base-3, $amount: 10);
+							}
+						}
+
+						height: 2.5em;
+						font-size: 1.1rem;
+						font-weight: 500;
+						color: white;
+						box-shadow: none;
+						border-style: hidden;
+						background-color: $palette-base-3;
+						width: 90%;
+						border-radius: 1.5em;
+
+						&:hover {
+							animation-name: submitHover;
+							animation-duration: 0.5s;
+							animation-fill-mode: forwards;
+						}
+					}
+				}
+			}
+		}
+	}
+}

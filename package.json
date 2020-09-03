@@ -1,0 +1,17 @@
+{
+	"name": "tome",
+	"version": "0.0.1",
+	"author": "Isaac",
+	"license": "MIT",
+	"private": true,
+	"scripts": {
+		"front": "cd frontend && yarn dev",
+		"back": "cd backend && yarn dev",
+		"clean:front": "cd frontend && yarn clean",
+		"clean:back": "cd backend && yarn clean",
+		"clean": "yarn run clean:front && yarn run clean:back",
+		"prep:front": "cd frontend && yarn install",
+		"prep:back": "cd backend && yarn install",
+		"prep": "yarn run prep:front && yarn run prep:back"
+	}
+}

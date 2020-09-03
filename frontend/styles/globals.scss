@@ -1,0 +1,26 @@
+@import '~bootstrap/scss/bootstrap';
+@import './variables';
+
+// Document format
+html,
+body,
+body,
+#__next {
+	height: 100%;
+}
+
+#App {
+	box-sizing: border-box;
+	font-size: 16px;
+	height: 100%;
+	background-color: $palette-base-2;
+	background-size: cover;
+	overflow: hidden;
+	button:focus {
+		outline: none;
+	}
+
+	input {
+		outline: none;
+	}
+}
