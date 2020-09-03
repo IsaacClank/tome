@@ -1,5 +1,7 @@
 # TOME - A SIMPLE PERSONAL LIBRARY
 
+---
+
 ## **OVERVIEW**
 
 This is an implementation of a **_Book Catalogue_** website.
@@ -21,7 +23,6 @@ This list will be updated when planned features are fully implemented.
     - Next.js
 3. Language: Typescript
 4. Other: VSCode
-
 
 ## **INSTALLATION**
 
