@@ -5,7 +5,7 @@ import AuthContext from 'lib/contexts/authContext';
 import { useRouter } from 'next/dist/client/router';
 
 // Style imports
-import styles from './account.module.scss';
+import styles from './index.module.scss';
 //
 // ---------------------------------MAIN COMPONENT---------------------------------
 //
