@@ -1,7 +1,7 @@
 import React from 'react';
 
 // Hook & context imports
-import AuthContext from 'lib/contexts/authContext';
+import AuthContext from 'libs/contexts/authContext';
 import { useRouter } from 'next/dist/client/router';
 
 // Style imports
@@ -16,7 +16,7 @@ const Account = () => {
 
 	React.useEffect(() => {
 		if (!authenticated) router.push({ pathname: '/account/authentication' });
-	}, [authenticated]);
+	}, [authenticated, router]);
 
 	return <div id={styles.Content}>Profile page</div>;
 };

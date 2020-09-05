@@ -10,7 +10,7 @@ type QueryObject = {
 	author?: string;
 };
 
-type QueryData = {
+interface QueryData {
 	items: {
 		id: string;
 		selfLink: string;
@@ -22,7 +22,8 @@ type QueryData = {
 		cover: string;
 		description: string;
 	}[];
-};
+	page: number;
+}
 
 export const searchBook = async (queryObj: QueryObject) => {
 	if (
@@ -31,8 +32,6 @@ export const searchBook = async (queryObj: QueryObject) => {
 		!queryObj.page
 	)
 		return Promise.reject(new ServerResponse(400, { error: 'MISSING QUERY CONDITION' }));
-
-	console.log(constructFetchURl(queryObj));
 
 	return fetch(constructFetchURl(queryObj))
 		.then(res => res.json())
@@ -46,7 +45,7 @@ export const searchBook = async (queryObj: QueryObject) => {
 // -----------------------------UTILS-----------------------------
 //
 
-const parseQueryResponse = async (data: any, queryObject: QueryObject) => {
+const parseQueryResponse = async (data: any, queryObject: QueryObject): Promise<QueryData> => {
 	return {
 		page: queryObject.page,
 		items: data.items.map((item: any) => ({

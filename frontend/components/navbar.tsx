@@ -7,11 +7,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 
 // Hook & contenxt imports
-import AuthContext from 'lib/contexts/authContext';
-import useFetch from 'lib/hooks/useFetch';
+import AuthContext from 'libs/contexts/authContext';
+import useFetch from 'libs/hooks/useFetch';
 import { useRouter } from 'next/dist/client/router';
 
-import { SERVER_HOST, AUTH_API_SIGNOUT } from 'lib/_config'; // env import
+import { SERVER_HOST, AUTH_API_SIGNOUT } from 'libs/_config'; // env import
 import styles from 'components/navbar.module.scss'; // Style import
 
 const NavBar = () => {
@@ -55,9 +55,10 @@ export default NavBar;
 // User options
 const UserOptions = () => {
 	const [active, setActive] = React.useState(false);
-	const { fetchState, startFetch } = useFetch(`${SERVER_HOST}${AUTH_API_SIGNOUT}`, {
+	const [options] = React.useState<RequestInit>({
 		credentials: 'include',
 	});
+	const [fetchState, startFetch] = useFetch(`${SERVER_HOST}${AUTH_API_SIGNOUT}`, options);
 	const Router = useRouter();
 
 	React.useEffect(() => {

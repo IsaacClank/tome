@@ -1,0 +1,79 @@
+@import 'styles/variables';
+
+#Content {
+	font-family: 'Fira Sans';
+	height: 100%;
+	padding: 6em 15em 0em 15em;
+	overflow: inherit;
+	font-size: inherit;
+
+	.row {
+		border-bottom: 1px solid black;
+	}
+}
+
+#SearchInfo {
+	h1 {
+		font-weight: 400;
+		font-size: 2rem;
+		& > span {
+			margin-left: 0.5em;
+			font-style: italic;
+			font-weight: 500;
+		}
+	}
+	margin-bottom: 2em;
+}
+
+#SearchPagination {
+	display: flex;
+	justify-content: flex-end;
+	align-items: flex-end;
+}
+
+#SearchResult {
+	justify-content: center;
+	margin-top: 2em;
+
+	.card {
+		padding: 2em 0.5em;
+		.cardImage {
+			max-width: 100%;
+		}
+		.cardBody {
+			.title {
+				font-size: 1.25rem;
+				font-weight: 700;
+			}
+			.author {
+				font-size: 1rem;
+				font-style: italic;
+				margin-bottom: 0.7em;
+			}
+			.rating {
+				font-size: 1.1rem;
+				font-weight: 500;
+				color: $palette-base-3;
+				margin-bottom: 1em;
+			}
+			.desc {
+				label {
+					margin-bottom: 0px;
+					font-weight: bold;
+					font-size: 1.1rem;
+					text-decoration-line: underline;
+				}
+				text-align: justify;
+				button {
+					background-color: transparent;
+					border: none;
+					text-decoration-line: underline;
+					color: blue;
+				}
+			}
+		}
+	}
+	.card:nth-child(odd) {
+		background-color: darken($color: $palette-base-2, $amount: 5);
+	}
+}

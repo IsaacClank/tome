@@ -1,11 +1,13 @@
 // JSX imports
 import { Container, Row } from 'react-bootstrap';
-
+//
 // Hook & context imports
-import { useForm } from 'lib/hooks/useForm';
-
+import { useForm } from 'libs/hooks/useForm';
+//
 // Style imports
 import styles from './index.module.scss';
+import { useRouter } from 'next/dist/client/router';
+import { PlainObject } from 'libs/_types';
 //
 // -----------------------------MAIN COMPONENT-----------------------------
 //
@@ -36,17 +38,30 @@ export default Index;
 // Search bar
 const SearchBar = () => {
 	// Construct search form
-	const [Form, formValues] = useForm(
+	const Router = useRouter();
+
+	const submitHandler = (formValues?: PlainObject) => {
+		Router.push({
+			query: {
+				...formValues,
+				maxResults: 10,
+				page: 1,
+			},
+			pathname: '/search',
+		});
+	};
+
+	const [Form] = useForm(
 		{
 			search: {
-				name: 'search',
+				name: 'q',
 				value: '',
 				type: 'text',
 				label: 'Start adding books to your library',
 				autocomplete: false,
 			},
 		},
-		() => console.log(formValues)
+		submitHandler
 	);
 
 	return Form;

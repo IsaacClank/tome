@@ -1,3 +1,4 @@
+import React from 'react';
 import { useReducer } from 'react';
 import { PlainObject } from '../_types';
 
@@ -36,7 +37,8 @@ export const useForm = (
 	formTemplate: FormTemplateOption,
 	onSubmit?: (formValues?: PlainObject) => void
 ): [JSX.Element, PlainObject] => {
-	const [formValues, dispatch] = useReducer((state: any, action: { target: any }) => {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	const [formValues, dispatch] = useReducer((state: PlainObject, action: { target: any }) => {
 		switch (action.target.type) {
 			case 'checkbox':
 				return { ...state, [action.target.id]: action.target.checked };
@@ -150,7 +152,7 @@ const generateForm = (
 
 // Initialize form values from FormTemplateOption
 const getFormValue = (fieldOption: FormTemplateOption): PlainObject => {
-	let intialVals: PlainObject = {};
+	const intialVals: PlainObject = {};
 	if (fieldOption)
 		Object.getOwnPropertyNames(fieldOption).forEach(field => {
 			intialVals[fieldOption[field].name] = fieldOption[field].value;

@@ -5,6 +5,8 @@ import { createContext } from 'react';
 // Not satisfactory result. Will possibly be replaced in the future
 const AuthContext = createContext({
 	authenticated: false,
-	changeAuthState: (isAuth: boolean) => {},
+	changeAuthState: (isAuth: boolean) => {
+		console.log(isAuth);
+	},
 });
 export default AuthContext;

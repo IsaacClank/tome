@@ -4,16 +4,16 @@ import React from 'react';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 
 // Hook & context imports
-import AuthContext from 'lib/contexts/authContext';
-import useFetch from 'lib/hooks/useFetch';
+import AuthContext from 'libs/contexts/authContext';
+import useFetch from 'libs/hooks/useFetch';
 import { useRouter } from 'next/dist/client/router';
-import { useForm } from 'lib/hooks/useForm';
+import { useForm } from 'libs/hooks/useForm';
 
 // style imports
 import styles from './authentication.module.scss';
 
 // Env imports
-import { SERVER_HOST, AUTH_API_SIGNIN, AUTH_API_SIGNUP } from 'lib/_config';
+import { SERVER_HOST, AUTH_API_SIGNIN, AUTH_API_SIGNUP } from 'libs/_config';
 
 // ----------------------------------MAIN COMPONENT----------------------------------
 // /account/authentication
@@ -24,14 +24,17 @@ const Authentication = () => {
 	const authContext = React.useContext(AuthContext); // authentication context
 	const router = useRouter();
 
-	// Redirect to home page if authenticated
-	React.useEffect(() => {
-		if (authContext.authenticated) router.replace('/');
-	}, [authContext.authenticated]);
 	// Update authentication context if authenticated successfully
 	React.useEffect(() => {
 		authContext.changeAuthState(authenticated);
-	}, [authenticated, authContext.changeAuthState]);
+	}, [authContext, authenticated]);
+
+	// Redirect to home page if authenticated
+	React.useEffect(() => {
+		if (authContext.authenticated) {
+			router.replace('/');
+		}
+	}, [authContext.authenticated, router]);
 
 	// Page component
 	// Share local authenticated state with child components
@@ -46,10 +49,7 @@ const Authentication = () => {
 							{/* A switcher component for switching between form types */}
 							<AuthenticationSwitcher current={type} switchAuthForm={setType} />
 							{/* Form renderer based on switcher current form type */}
-							<AuthenticationFormRenderer
-								currentType={type}
-								authChangeHandler={setAuthenticated}
-							/>
+							<AuthenticationFormRenderer currentType={type} authChangeHandler={setAuthenticated} />
 						</div>
 					</Col>
 				</Row>
@@ -152,8 +152,8 @@ const LoginForm = (props: { AuthChangeHandler: (authenticated: boolean) => void 
 		},
 		() => startFetch()
 	);
-	// Declare a fetch object to send form data to backend
-	const { fetchState, startFetch } = useFetch(`${SERVER_HOST}${AUTH_API_SIGNIN}`, {
+
+	const [option, setOption] = React.useState<RequestInit>({
 		method: 'POST',
 		credentials: 'include',
 		headers: {
@@ -161,12 +161,24 @@ const LoginForm = (props: { AuthChangeHandler: (authenticated: boolean) => void 
 		},
 		body: JSON.stringify(FormValues),
 	});
+	React.useEffect(() => {
+		setOption({
+			method: 'POST',
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(FormValues),
+		});
+	}, [FormValues]);
+	// Declare a fetch object to send form data to backend
+	const [fetchState, startFetch] = useFetch(`${SERVER_HOST}${AUTH_API_SIGNIN}`, option);
 
 	// Handle fetch result
 	React.useEffect(() => {
 		if (fetchState.status === 'RECEIVED') props.AuthChangeHandler(true); // update parrent component authenticated state
 		if (fetchState.status === 'ERROR') console.error(fetchState.error);
-	}, [fetchState]);
+	}, [fetchState, props]);
 
 	return Form;
 };
@@ -212,8 +224,7 @@ const RegisterForm = (props: { AuthChangeHandler: (authenticated: boolean) => vo
 		() => startFetch()
 	);
 
-	// Declare fetch object with custom useFetch hook
-	const { fetchState, startFetch } = useFetch(`${SERVER_HOST}${AUTH_API_SIGNUP}`, {
+	const [option, setOption] = React.useState<RequestInit>({
 		method: 'POST',
 		credentials: 'include',
 		headers: {
@@ -221,12 +232,24 @@ const RegisterForm = (props: { AuthChangeHandler: (authenticated: boolean) => vo
 		},
 		body: JSON.stringify(FormValues),
 	});
+	React.useEffect(() => {
+		setOption({
+			method: 'POST',
+			credentials: 'include',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(FormValues),
+		});
+	}, [FormValues]);
+	// Declare fetch object with custom useFetch hook
+	const [fetchState, startFetch] = useFetch(`${SERVER_HOST}${AUTH_API_SIGNUP}`, option);
 
 	// Handle fetch result
 	React.useEffect(() => {
 		if (fetchState.status === 'RECEIVED') props.AuthChangeHandler(true); // update parrent authenticated state
 		if (fetchState.status === 'ERROR') console.error(fetchState.error);
-	}, [fetchState]);
+	}, [fetchState, props]);
 
 	return Form;
 };
