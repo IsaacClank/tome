@@ -14,7 +14,7 @@ export const signUp = async (user: User): Promise<PlainObject | ServerResponse> 
 	if (!(user.email && user.password && user.username))
 		return Promise.reject(new ServerResponse(400, { error: 'MISSING INFORMATION' }));
 	// prepare query statement
-	const statement = `INSERT INTO accounts(_id, username, email, password) VALUES($1,$2,$3,$4) RETURNING email, username`;
+	const statement = `INSERT INTO account(_id, username, email, password) VALUES($1,$2,$3,$4) RETURNING email, username`;
 	const params = [generateID(), user.username, user.email, await hashPassword(user.password)];
 	// make query
 	return query(statement, params).then(result => result.rows[0]);
@@ -24,12 +24,13 @@ export const signIn = async (user: User): Promise<PlainObject | ServerResponse> 
 	if (!(user.email || user.password))
 		return Promise.reject(new ServerResponse(400, { error: 'MISSING INFORMATION' }));
 	// prepare query statement
-	const statement = 'SELECT * FROM accounts WHERE email=$1';
+	const statement = 'SELECT * FROM account WHERE email=$1';
 	const params = [user.email];
 	// make query
 	return query(statement, params).then(async result => {
 		// check for wrong email or password
-		if (!result.rowCount) return Promise.reject(new ServerResponse(400, { error: 'NO MATCHING EMAIL' }));
+		if (!result.rowCount)
+			return Promise.reject(new ServerResponse(400, { error: 'NO MATCHING EMAIL' }));
 		if (!(await checkPassword(user.password!, result.rows[0].password)))
 			return Promise.reject(new ServerResponse(400, { error: 'WRONG PASSWORD' }));
 		// return email and username

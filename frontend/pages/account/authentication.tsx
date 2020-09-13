@@ -1,72 +1,81 @@
 import React from 'react';
+import { mutate } from 'swr';
+import { PlainObject } from 'libs/_types';
 
 // JSX imports
 import { Container, Row, Col, Button } from 'react-bootstrap';
+import Loading from 'components/Loading';
 
 // Hook & context imports
-import AuthContext from 'libs/contexts/authContext';
 import useFetch from 'libs/hooks/useFetch';
+import useAuth from 'libs/hooks/useAuth';
 import { useRouter } from 'next/dist/client/router';
 import { useForm } from 'libs/hooks/useForm';
+import useLoader from 'libs/hooks/useLoader';
 
 // style imports
 import styles from './authentication.module.scss';
 
 // Env imports
-import { SERVER_HOST, AUTH_API_SIGNIN, AUTH_API_SIGNUP } from 'libs/_config';
+import { SERVER_HOST, AUTH_API_SIGNIN, AUTH_API_SIGNUP, AUTH_API } from 'libs/_config';
 
 // ----------------------------------MAIN COMPONENT----------------------------------
+
 // /account/authentication
 // Provide a forms for signing in and registering
 const Authentication = () => {
 	const [type, setType] = React.useState(AuthenticationType.login); // Default form type
-	const [authenticated, setAuthenticated] = React.useState(false); // authenticated state
-	const authContext = React.useContext(AuthContext); // authentication context
+	const { data } = useAuth();
 	const router = useRouter();
 
-	// Update authentication context if authenticated successfully
-	React.useEffect(() => {
-		authContext.changeAuthState(authenticated);
-	}, [authContext, authenticated]);
-
-	// Redirect to home page if authenticated
-	React.useEffect(() => {
-		if (authContext.authenticated) {
+	const redirect = (success: boolean, payload: any) => {
+		if (success) {
+			mutate(`${SERVER_HOST}${AUTH_API}`);
 			router.replace('/');
-		}
-	}, [authContext.authenticated, router]);
+		} else console.error(payload);
+	};
 
-	// Page component
-	// Share local authenticated state with child components
-	// Pass setType to AuthenticationSwitcher to handle switching between form types
-	// Pass setAuthenticated to AuthenticatedFormRenderer to be called when authentication fetch is successfull
-	return (
-		<div id={styles.Content}>
-			<Container fluid>
-				<Row>
-					<Col id={styles.FormWrapper} sm={12}>
-						<div id={styles.AuthenticationForm}>
-							{/* A switcher component for switching between form types */}
-							<AuthenticationSwitcher current={type} switchAuthForm={setType} />
-							{/* Form renderer based on switcher current form type */}
-							<AuthenticationFormRenderer currentType={type} authChangeHandler={setAuthenticated} />
-						</div>
-					</Col>
-				</Row>
-			</Container>
-		</div>
-	);
+	const page = useLoader(data?.authenticated, {
+		load: () => <Loading />,
+		dest: () => {
+			// Redirect because already authenticated
+			router.replace({ pathname: '/' });
+			return <div></div>;
+		},
+		alt: () => (
+			// Page component
+			// Share local authenticated state with child components
+			// Pass setType to AuthenticationSwitcher to handle switching between form types
+			// Pass setAuthenticated to AuthenticatedFormRenderer to be called when authentication fetch is successfull
+			<div id={styles.Content}>
+				<Container fluid>
+					<Row>
+						<Col id={styles.FormWrapper} sm={12}>
+							<div id={styles.AuthenticationForm}>
+								{/* A switcher component for switching between form types */}
+								<AuthenticationSwitcher current={type} switchAuthForm={setType} />
+								{/* Form renderer based on switcher current form type */}
+								<AuthenticationFormRenderer currentType={type} authChangeHandler={redirect} />
+							</div>
+						</Col>
+					</Row>
+				</Container>
+			</div>
+		),
+	});
+	return <>{page}</>;
 };
 export default Authentication;
-//
+
 // -----------------------------CHILD COMPONENTS-----------------------------
 //
+
 // Types of authentication form
 enum AuthenticationType {
 	login = 'login',
 	register = 'register',
 }
-//
+
 // Authentication switcher
 const AuthenticationSwitcher = (props: {
 	current: string;
@@ -107,11 +116,11 @@ const AuthenticationSwitcher = (props: {
 		</div>
 	);
 };
-//
+
 // Renderer for current chose form type
 const AuthenticationFormRenderer = (props: {
 	currentType: string;
-	authChangeHandler: (authenticated: boolean) => void;
+	authChangeHandler: (authenticated: boolean, payload?: any) => void;
 }) => {
 	// Render based on current form type
 	switch (props.currentType) {
@@ -120,136 +129,123 @@ const AuthenticationFormRenderer = (props: {
 		case AuthenticationType.register:
 			return <RegisterForm AuthChangeHandler={props.authChangeHandler} />;
 		default:
-			return <></>;
+			return <div></div>;
 	}
 };
-//
+
 // Login form component
-const LoginForm = (props: { AuthChangeHandler: (authenticated: boolean) => void }) => {
+const LoginForm = (props: {
+	AuthChangeHandler: (authenticated: boolean, payload?: any) => void;
+}) => {
 	// Construct form using custom useForm hook
 	// On submit, excute declared fetch object
-	const [Form, FormValues] = useForm(
-		{
-			email: {
-				name: 'email',
-				type: 'email',
-				value: '',
-				required: true,
-				placeholder: 'Email',
-			},
-			password: {
-				name: 'password',
-				type: 'password',
-				placeholder: 'Password',
-				required: true,
-				value: '',
-			},
-			submit: {
-				name: 'submit',
-				type: 'submit',
-				value: 'LOGIN',
-			},
-		},
-		() => startFetch()
+	const [Form] = useForm(constructAuthenticationForm('signin'), FormValues =>
+		makeFetch(fetchAction, 'signin', FormValues)
 	);
 
-	const [option, setOption] = React.useState<RequestInit>({
-		method: 'POST',
-		credentials: 'include',
-		headers: {
-			'Content-Type': 'application/json',
-		},
-		body: JSON.stringify(FormValues),
-	});
-	React.useEffect(() => {
-		setOption({
-			method: 'POST',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(FormValues),
-		});
-	}, [FormValues]);
 	// Declare a fetch object to send form data to backend
-	const [fetchState, startFetch] = useFetch(`${SERVER_HOST}${AUTH_API_SIGNIN}`, option);
+	const [fetchState, fetchAction] = useFetch();
 
 	// Handle fetch result
 	React.useEffect(() => {
-		if (fetchState.status === 'RECEIVED') props.AuthChangeHandler(true); // update parrent component authenticated state
-		if (fetchState.status === 'ERROR') console.error(fetchState.error);
+		if (fetchState.status === 'RECEIVED') props.AuthChangeHandler(true, fetchState.data);
+		if (fetchState.status === 'ERROR') props.AuthChangeHandler(false, fetchState.error);
 	}, [fetchState, props]);
 
 	return Form;
 };
-//
+
 // Register form component
-const RegisterForm = (props: { AuthChangeHandler: (authenticated: boolean) => void }) => {
+const RegisterForm = (props: {
+	AuthChangeHandler: (authenticated: boolean, payload?: any) => void;
+}) => {
 	// Construct form using custom useForm hook
 	// On form submit, execute fetch object
-	const [Form, FormValues] = useForm(
-		{
-			email: {
-				name: 'email',
-				type: 'email',
-				value: '',
-				placeholder: 'Email',
-			},
-			username: {
-				name: 'username',
-				type: 'text',
-				value: '',
-				placeholder: 'Username',
-				autocomplete: false,
-			},
-			password: {
-				name: 'password',
-				type: 'password',
-				value: '',
-				placeholder: 'Password',
-			},
-			confirmPassword: {
-				name: 'confirmPassword',
-				type: 'password',
-				value: '',
-				placeholder: 'Confirm your password',
-				autocomplete: false,
-			},
-			submit: {
-				name: 'submit',
-				type: 'submit',
-				value: 'REGISTER',
-			},
-		},
-		() => startFetch()
+	const [Form] = useForm(constructAuthenticationForm('signup'), FormValues =>
+		makeFetch(fetchAction, 'signup', FormValues)
 	);
 
-	const [option, setOption] = React.useState<RequestInit>({
+	// Declare fetch object with custom useFetch hook
+	const [fetchState, fetchAction] = useFetch();
+
+	// Handle fetch result
+	React.useEffect(() => {
+		if (fetchState.status === 'RECEIVED') props.AuthChangeHandler(true, fetchState.data); // update parrent authenticated state
+		if (fetchState.status === 'ERROR') props.AuthChangeHandler(false, fetchState.error);
+	}, [fetchState, props]);
+
+	return Form;
+};
+
+// -----------------------------UTILS-----------------------------
+//
+const makeFetch = (fetchAction: any, type: 'signin' | 'signup', body?: PlainObject) => {
+	fetchAction.setUrl(`${SERVER_HOST}${type === 'signin' ? AUTH_API_SIGNIN : AUTH_API_SIGNUP}`);
+	fetchAction.setOption({
 		method: 'POST',
 		credentials: 'include',
 		headers: {
 			'Content-Type': 'application/json',
 		},
-		body: JSON.stringify(FormValues),
+		body: JSON.stringify(body),
 	});
-	React.useEffect(() => {
-		setOption({
-			method: 'POST',
-			credentials: 'include',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify(FormValues),
-		});
-	}, [FormValues]);
-	// Declare fetch object with custom useFetch hook
-	const [fetchState, startFetch] = useFetch(`${SERVER_HOST}${AUTH_API_SIGNUP}`, option);
+	fetchAction.startFetch();
+};
 
-	// Handle fetch result
-	React.useEffect(() => {
-		if (fetchState.status === 'RECEIVED') props.AuthChangeHandler(true); // update parrent authenticated state
-		if (fetchState.status === 'ERROR') console.error(fetchState.error);
-	}, [fetchState, props]);
-
-	return Form;
+const constructAuthenticationForm = (type: 'signin' | 'signup'): Parameters<typeof useForm>[0] => {
+	return type === 'signin'
+		? {
+				email: {
+					name: 'email',
+					type: 'email',
+					value: '',
+					required: true,
+					placeholder: 'Email',
+				},
+				password: {
+					name: 'password',
+					type: 'password',
+					placeholder: 'Password',
+					required: true,
+					value: '',
+				},
+				submit: {
+					name: 'submit',
+					type: 'submit',
+					value: 'LOGIN',
+				},
+		  }
+		: {
+				email: {
+					name: 'email',
+					type: 'email',
+					value: '',
+					placeholder: 'Email',
+				},
+				username: {
+					name: 'username',
+					type: 'text',
+					value: '',
+					placeholder: 'Username',
+					autocomplete: false,
+				},
+				password: {
+					name: 'password',
+					type: 'password',
+					value: '',
+					placeholder: 'Password',
+				},
+				confirmPassword: {
+					name: 'confirmPassword',
+					type: 'password',
+					value: '',
+					placeholder: 'Confirm your password',
+					autocomplete: false,
+				},
+				submit: {
+					name: 'submit',
+					type: 'submit',
+					value: 'REGISTER',
+				},
+		  };
 };

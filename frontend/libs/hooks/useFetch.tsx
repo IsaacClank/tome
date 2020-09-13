@@ -1,5 +1,5 @@
 import { PlainObject } from 'libs/_types';
-import { useEffect, useReducer, useState } from 'react';
+import { Dispatch, SetStateAction, useEffect, useReducer, useState } from 'react';
 
 //
 // --------------------------------------TYPE DEFINITION--------------------------------------
@@ -19,6 +19,12 @@ interface FetchState {
 	data: PlainObject; // Data received if the fetch is successful
 }
 
+interface FetchAction {
+	startFetch: () => void;
+	setUrl: Dispatch<SetStateAction<RequestInfo>>;
+	setOption: Dispatch<SetStateAction<RequestInit>>;
+}
+
 //
 // --------------------------------------FETCH HOOK--------------------------------------
 //
@@ -27,30 +33,18 @@ interface FetchState {
 // Same parameter interface as fetch api
 // Also accept an optional 'immediate' boolean parameter.
 // Useful if the fetch only need to run once and/or doesn't depend of other states
-const useFetch = (
-	url: Parameters<typeof fetch>[0],
-	options: Parameters<typeof fetch>[1] = {}
-): [FetchState, () => void] => {
+const useFetch = (): [FetchState, FetchAction] => {
 	// FetchState state
 	const [fetchState, updateFetchState] = useReducer(
 		fetchStateReducer,
 		{ status: FetchStatus.idle, error: {}, data: {} } // initialize value for FetchState
 	);
-	const [fetchUrl, setFetchUrl] = useState(url);
-	const [fetchOption, setFetchOption] = useState(options);
+	const [fetchUrl, setFetchUrl] = useState<RequestInfo>('');
+	const [fetchOption, setFetchOption] = useState<RequestInit>({});
 	const [ready, setReady] = useState(false);
-
-	useEffect(() => {
-		setFetchUrl(url);
-	}, [url]);
-
-	useEffect(() => {
-		setFetchOption(options);
-	}, [options]);
 
 	// Execute fetch
 	useEffect(() => {
-		let unmount = false; // prevent component state update while unmount
 		// Fetch function
 		const makeFetch = async () => {
 			// Perform fetch if component is not unmounted
@@ -78,7 +72,8 @@ const useFetch = (
 				});
 		};
 
-		if (ready && fetchUrl !== '') {
+		let unmount = false; // prevent component state update while unmount
+		if (ready) {
 			makeFetch();
 		}
 
@@ -87,10 +82,13 @@ const useFetch = (
 			setReady(false);
 			unmount = true;
 		};
-	}, [fetchUrl, fetchOption, ready]);
+	}, [fetchOption, fetchUrl, ready]);
 
 	// Return FetchState and a function to set ready=true if immediate=false
-	return [fetchState, () => setReady(true)];
+	return [
+		fetchState,
+		{ startFetch: () => setReady(true), setOption: setFetchOption, setUrl: setFetchUrl },
+	];
 };
 export default useFetch;
 

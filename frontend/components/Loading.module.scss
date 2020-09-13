@@ -1,0 +1,9 @@
+#Content {
+	height: 100%;
+	background-color: white;
+	padding-top: 20em;
+	& > div {
+		display: flex;
+		justify-content: center;
+	}
+}

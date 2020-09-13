@@ -7,15 +7,30 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
 
 // Hook & contenxt imports
-import AuthContext from 'libs/contexts/authContext';
 import useFetch from 'libs/hooks/useFetch';
 import { useRouter } from 'next/dist/client/router';
+import useLoader from 'libs/hooks/useLoader';
 
-import { SERVER_HOST, AUTH_API_SIGNOUT } from 'libs/_config'; // env import
+import { AUTH_API_SIGNOUT, SERVER_HOST } from 'libs/_config'; // env import
 import styles from 'components/navbar.module.scss'; // Style import
+import useAuth from 'libs/hooks/useAuth';
 
 const NavBar = () => {
-	const { authenticated } = React.useContext(AuthContext);
+	const { data } = useAuth();
+	const status = useLoader(data?.authenticated, {
+		// eslint-disable-next-line react/display-name
+		alt: () => {
+			return (
+				<Link href='/account/authentication'>
+					<a>
+						<button className={styles.navItem}>Login</button>
+					</a>
+				</Link>
+			);
+		},
+		dest: () => <UserOptions />,
+	});
+
 	return (
 		<div className={styles.fixed}>
 			<Container fluid id={styles.NavBar}>
@@ -32,15 +47,7 @@ const NavBar = () => {
 						<NavLink />
 					</Col>
 					<Col id={styles.UserOptions} xs={12} lg={4} xl={{ offset: 6, span: 1 }}>
-						{authenticated ? (
-							<UserOptions />
-						) : (
-							<Link href='/account/authentication'>
-								<a>
-									<button className={styles.navItem}>Login</button>
-								</a>
-							</Link>
-						)}
+						{status as JSX.Element}
 					</Col>
 				</Row>
 			</Container>
@@ -55,11 +62,14 @@ export default NavBar;
 // User options
 const UserOptions = () => {
 	const [active, setActive] = React.useState(false);
-	const [options] = React.useState<RequestInit>({
-		credentials: 'include',
-	});
-	const [fetchState, startFetch] = useFetch(`${SERVER_HOST}${AUTH_API_SIGNOUT}`, options);
+	const [fetchState, fetchAction] = useFetch();
 	const Router = useRouter();
+
+	const onButtonClick = () => {
+		fetchAction.setUrl(`${SERVER_HOST}${AUTH_API_SIGNOUT}`);
+		fetchAction.setOption({ credentials: 'include' });
+		fetchAction.startFetch();
+	};
 
 	React.useEffect(() => {
 		if (fetchState.status === 'RECEIVED') Router.reload();
@@ -89,7 +99,7 @@ const UserOptions = () => {
 						</Link>
 					</li>
 					<li>
-						<button onClick={startFetch}>Sign Out</button>
+						<button onClick={onButtonClick}>Sign Out</button>
 					</li>
 				</ul>
 			</div>

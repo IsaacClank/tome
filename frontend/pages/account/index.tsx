@@ -1,24 +1,35 @@
 import React from 'react';
 
 // Hook & context imports
-import AuthContext from 'libs/contexts/authContext';
 import { useRouter } from 'next/dist/client/router';
 
 // Style imports
 import styles from './index.module.scss';
+import useAuth from 'libs/hooks/useAuth';
+import useLoader from 'libs/hooks/useLoader';
+import Loading from 'components/Loading';
 //
 // ---------------------------------MAIN COMPONENT---------------------------------
 //
 // route: /account
 const Account = () => {
-	const { authenticated } = React.useContext(AuthContext);
+	const { data } = useAuth();
 	const router = useRouter();
+	const Page = useLoader(data?.authenticated, {
+		dest: () => (
+			<div id={styles.Content}>
+				<h1>Profile Page</h1>
+			</div>
+		),
+		load: () => <Loading />,
+		alt: () => {
+			router.replace({ pathname: '/account/authentication' });
+			return <div></div>;
+		},
+	});
 
-	React.useEffect(() => {
-		if (!authenticated) router.push({ pathname: '/account/authentication' });
-	}, [authenticated, router]);
-
-	return <div id={styles.Content}>Profile page</div>;
+	// if (data?.authenticated === false) router.push({ pathname: '/account/authentication' });
+	return <>{Page}</>;
 };
 
 export default Account;

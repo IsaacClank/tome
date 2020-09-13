@@ -4,6 +4,7 @@ dist/
 .next/
 # 
 *.pgsql
+*.sql
 yarn-*
 *.env*
 *.vscode

@@ -1,5 +1,4 @@
 import React from 'react';
-import useFetch from 'libs/hooks/useFetch';
 import { SERVER_HOST, LIB_API_QUERY } from 'libs/_config';
 import { checkEmptyObject, isPlainObject } from 'libs/_types';
 import { useRouter } from 'next/dist/client/router';
@@ -10,6 +9,7 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 
 import styles from './search.module.scss';
+import useSWR from 'swr';
 
 interface QueryData {
 	items: {
@@ -29,22 +29,14 @@ interface QueryData {
 //
 // -----------------------------MAIN COMPONENT-----------------------------
 //
+const fetcher = (url: string) => fetch(url).then(r => r.json());
 const Search = () => {
 	const query = useRouter().query;
 
-	const [options] = React.useState<RequestInit>({ credentials: 'include' });
-	const [fetchState, trigger] = useFetch(
-		checkEmptyObject(query) ? '' : `${SERVER_HOST}${LIB_API_QUERY}?${parseQueryString(query)}`,
-		options
-	);
-
-	React.useEffect(() => {
-		trigger();
-	}, [query, trigger]);
-
-	React.useEffect(() => {
-		if (fetchState.status === 'ERROR') console.error(fetchState.error);
-	}, [fetchState]);
+	const { data } = useSWR(() => {
+		if (checkEmptyObject(query)) return null;
+		else return `${SERVER_HOST}${LIB_API_QUERY}?${parseQueryString(query)}`;
+	}, fetcher);
 
 	return (
 		<div id={styles.Content}>
@@ -60,7 +52,7 @@ const Search = () => {
 					</Col>
 				</Row>
 				<Row id={styles.SearchResult}>
-					<ResultRenderer data={fetchState.data.data || null} />
+					<ResultRenderer data={data?.data || null} />
 				</Row>
 			</Container>
 		</div>
