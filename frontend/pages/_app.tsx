@@ -1,5 +1,4 @@
 import React from 'react';
-
 import { AppProps } from 'next/app';
 // JSX imports
 import NavBar from 'components/navbar';
@@ -22,7 +21,6 @@ const App = (props: AppProps) => {
 				<NavBar />
 				{/* Content */}
 				<props.Component {...props.pageProps} />
-				{/*  */}
 			</div>
 		</>
 	);
