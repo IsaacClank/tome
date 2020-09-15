@@ -1,0 +1,53 @@
+@import 'styles/variables.scss';
+
+#Content {
+	font-family: $font-firasans;
+	padding-top: 8em;
+	height: 100%;
+	background-color: $palette-base-2;
+	overflow: inherit;
+
+	.cover {
+		width: 100%;
+	}
+
+	.title {
+		font-size: 2.5rem;
+	}
+
+	.subtitle {
+		color: lighten($color: black, $amount: 25);
+		font-style: italic;
+		margin-bottom: 1em;
+	}
+	.rating,
+	.language,
+	.publishedDate,
+	.publisher,
+	.isbn {
+		margin-bottom: 0.5em;
+		font-size: 1.15rem;
+		label {
+			margin-right: 0.25em;
+		}
+	}
+	.preview {
+		position: absolute;
+		bottom: 0px;
+	}
+
+	.description {
+		margin-top: 3em;
+		label {
+			font-size: 1.25rem;
+			font-weight: 600;
+			text-decoration-line: underline;
+		}
+		p {
+			font-size: 0.9rem;
+			br {
+				margin-bottom: 0px;
+			}
+		}
+	}
+}

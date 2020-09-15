@@ -37,4 +37,22 @@ router.get('/query', parseQueryString, async (req, res, next) => {
 	return next();
 });
 
+router.get('/detail/:id', async (req, res, next) => {
+	if (!res.locals.err) {
+		await LibraryService.getBookDetail(req.params.id)
+			.then(data => {
+				res.locals.rep = ServerResponse.compile(res.locals.rep, { data: data });
+			})
+			.catch(err => {
+				if (ServerResponse.parse(err)) res.locals.err = err;
+				else
+					res.locals.err = new ServerResponse(500, {
+						error: 'INTERNAL ERROR',
+						detail: err,
+					});
+			});
+	}
+	return next();
+});
+
 export default router;
