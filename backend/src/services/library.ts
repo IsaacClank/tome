@@ -2,6 +2,8 @@ import fetch from 'node-fetch';
 import { GB_API } from '../_config';
 import { ServerResponse } from '../_types';
 
+// -----------------------------------TYPES-----------------------------------
+//
 type QueryObject = {
 	q: string;
 	page: number;
@@ -25,12 +27,10 @@ interface QueryData {
 	page: number;
 }
 
+// -----------------------------------SERVICES-----------------------------------
+//
 export const searchBook = async (queryObj: QueryObject) => {
-	if (
-		!(queryObj.q || queryObj.author || queryObj.title) ||
-		!queryObj.maxResults ||
-		!queryObj.page
-	)
+	if (!(queryObj.q || queryObj.author || queryObj.title) || !queryObj.maxResults || !queryObj.page)
 		return Promise.reject(new ServerResponse(400, { error: 'MISSING QUERY CONDITION' }));
 
 	return fetch(constructFetchURl(queryObj))
@@ -41,24 +41,34 @@ export const searchBook = async (queryObj: QueryObject) => {
 		});
 };
 
-//
+export const getBookDetail = async (id: string) => {
+	if (!id) return Promise.reject(new ServerResponse(400, { error: 'NO BOOK ID PROVIDED' }));
+	console.log(`${GB_API}/${id}`);
+	return fetch(`${GB_API}/${id}`)
+		.then(r => r.json())
+		.then(data => {
+			if (data.error) return Promise.reject(new ServerResponse(500, { error: data.error }));
+			return data?.volumeInfo;
+		});
+};
+
 // -----------------------------UTILS-----------------------------
 //
-
 const parseQueryResponse = async (data: any, queryObject: QueryObject): Promise<QueryData> => {
 	return {
 		page: queryObject.page,
-		items: data.items.map((item: any) => ({
-			id: item.id || '',
-			selfLink: item.selfLink || '',
-			title: item.volumeInfo.title,
-			subtitle: item.volumeInfo.subtitle || '',
-			authors: item.volumeInfo.authors || [''],
-			publishedDate: item.volumeInfo.publishedDate || '',
-			rating: item.volumeInfo.averageRating || '',
-			cover: item.volumeInfo.imageLinks ? item.volumeInfo.imageLinks.thumbnail : '',
-			description: item.volumeInfo.description || '',
-		})),
+		items:
+			data?.items?.map((item: any) => ({
+				id: item.id || '',
+				selfLink: item.selfLink || '',
+				title: item.volumeInfo.title,
+				subtitle: item.volumeInfo.subtitle || '',
+				authors: item.volumeInfo.authors || [''],
+				publishedDate: item.volumeInfo.publishedDate || '',
+				rating: item.volumeInfo.averageRating || '',
+				cover: item.volumeInfo.imageLinks ? item.volumeInfo.imageLinks.thumbnail : '',
+				description: item.volumeInfo.description || '',
+			})) || [],
 	};
 };
 

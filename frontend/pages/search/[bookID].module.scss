@@ -1,0 +1,9 @@
+@import 'styles/variables.scss';
+
+#Content {
+	font-family: $font-firasans;
+	padding-top: 5em;
+	height: 100%;
+	background-color: $palette-base-2;
+	overflow: inherit;
+}
