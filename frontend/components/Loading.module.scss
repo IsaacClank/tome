@@ -1,7 +1,7 @@
-#Content {
+#Container {
 	height: 100%;
-	background-color: white;
-	padding-top: 20em;
+	background-color: inherit;
+	padding-top: 10em;
 	& > div {
 		display: flex;
 		justify-content: center;

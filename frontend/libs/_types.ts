@@ -9,8 +9,8 @@ export const isPlainObject = (object: any): object is PlainObject => {
 	else return false;
 };
 
-export const checkEmptyObject = (object: any): boolean => {
-	if (!object) return false;
+export const isEmptyObject = (object: any): boolean => {
+	if (!object) return true;
 	if (Object.keys(object)?.length) return false;
 	return true;
 };

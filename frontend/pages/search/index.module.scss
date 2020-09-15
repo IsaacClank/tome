@@ -1,4 +1,4 @@
-@import 'styles/variables';
+@import 'styles/_variables';
 
 #Content {
 	font-family: 'Fira Sans';
@@ -6,6 +6,7 @@
 	padding: 6em 15em 0em 15em;
 	overflow: inherit;
 	font-size: inherit;
+	overflow-y: scroll;
 
 	.row {
 		border-bottom: 1px solid black;
@@ -22,7 +23,7 @@
 			font-weight: 500;
 		}
 	}
-	margin-bottom: 2em;
+	margin-bottom: 1.5em;
 }
 
 #SearchPagination {
@@ -36,7 +37,7 @@
 	margin-top: 2em;
 
 	.card {
-		padding: 2em 0.5em;
+		padding: 2em 0.5em 1em 0.5em;
 		.cardImage {
 			max-width: 100%;
 		}
@@ -57,10 +58,10 @@
 				margin-bottom: 1em;
 			}
 			.desc {
+				font-size: 1rem;
 				label {
 					margin-bottom: 0px;
 					font-weight: bold;
-					font-size: 1.1rem;
 					text-decoration-line: underline;
 				}
 				text-align: justify;
@@ -76,4 +77,24 @@
 	.card:nth-child(odd) {
 		background-color: darken($color: $palette-base-2, $amount: 5);
 	}
+}
+
+#SearchPagination {
+	button {
+		width: 5em;
+		background-color: $palette-base-3;
+		border-style: none;
+		color: white;
+		margin: 0.2em 0.2em;
+	}
+}
+
+#Scroller {
+	font-size: 5rem;
+	cursor: pointer;
+	position: fixed;
+	right: 0.5em;
+	bottom: 0.5em;
+	opacity: 0.5;
+	display: block;
 }

@@ -2,9 +2,9 @@ import styles from './Loading.module.scss';
 
 const Loading = () => {
 	return (
-		<div id={styles.Content}>
+		<div id={styles.Container}>
 			<div>
-				<img src='/loading.gif' alt='' />
+				<img src='/loading1.gif' alt='' />
 			</div>
 		</div>
 	);

@@ -28,7 +28,6 @@ const Account = () => {
 		},
 	});
 
-	// if (data?.authenticated === false) router.push({ pathname: '/account/authentication' });
 	return <>{Page}</>;
 };
 

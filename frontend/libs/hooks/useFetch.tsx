@@ -105,7 +105,7 @@ const fetchStateReducer = (
 		case FetchStatus.fetching: // Fetch was executed and waiting
 			return { ...state, status: FetchStatus.fetching };
 		case 'ERROR': // Fetch was executed and encounter error
-			return { ...state, status: FetchStatus.error, data: action.payload ?? {} };
+			return { ...state, status: FetchStatus.error, error: action.payload ?? {} };
 		case 'RECEIVED': // Fetch was executed and received ok status
 			return { ...state, status: FetchStatus.received, data: action.payload ?? {} };
 		default:
