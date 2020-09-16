@@ -1,24 +1,27 @@
+// Functionality
 import React from 'react';
 import Link from 'next/link';
-
-// JSX Import
+import { useRouter } from 'next/dist/client/router';
+import useLoader from 'libs/hooks/useLoader';
+import useAuth from 'libs/hooks/useAuth';
+import useSWR from 'swr';
+import useFetcher from 'libs/hooks/useFetcher';
+// JSX
 import { Container, Row, Col } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
+// Configs
+import { AUTH_API_SIGNOUT, SERVER_HOST } from 'libs/_config';
+// Style
+import styles from 'components/navbar.module.scss';
 
-// Hook & contenxt imports
-import useFetch from 'libs/hooks/useFetch';
-import { useRouter } from 'next/dist/client/router';
-import useLoader from 'libs/hooks/useLoader';
-
-import { AUTH_API_SIGNOUT, SERVER_HOST } from 'libs/_config'; // env import
-import styles from 'components/navbar.module.scss'; // Style import
-import useAuth from 'libs/hooks/useAuth';
-
+// ---------------------------------------------- MAIN COMPONENT
+//
+// Navigation bar
 const NavBar = () => {
-	const { data } = useAuth();
-	const status = useLoader(data?.authenticated, {
-		// eslint-disable-next-line react/display-name
+	const { data } = useAuth(); // get auth state
+	// loader logic for protected button
+	const userButton = useLoader(data?.authenticated, {
 		alt: () => {
 			return (
 				<Link href='/account/authentication'>
@@ -46,8 +49,12 @@ const NavBar = () => {
 					<Col id={styles.Navlink} xs={12} lg={6} xl={4}>
 						<NavLink />
 					</Col>
-					<Col id={styles.UserOptions} xs={12} lg={4} xl={{ offset: 6, span: 1 }}>
-						{status as JSX.Element}
+					<Col
+						id={styles.UserOptions}
+						xs={12}
+						lg={4}
+						xl={{ offset: 6, span: 1 }}>
+						{userButton as JSX.Element}
 					</Col>
 				</Row>
 			</Container>
@@ -57,23 +64,23 @@ const NavBar = () => {
 
 export default NavBar;
 
-// ------------------------UTILS------------------------
-
-// User options
+// ---------------------------------------------- UTILS
+//
+// Protected user button
 const UserOptions = () => {
-	const [active, setActive] = React.useState(false);
-	const [fetchState, fetchAction] = useFetch();
-	const Router = useRouter();
+	const Router = useRouter(); // router object
+	const [active, setActive] = React.useState(false); // dropdown state
+	const [isSigningOut, setSigningOut] = React.useState(false); // on signout button clicked, isSigningOut = true
+	const { fetcher } = useFetcher({ options: { credentials: 'include' } }); // fetcher for swr
 
-	const onButtonClick = () => {
-		fetchAction.setUrl(`${SERVER_HOST}${AUTH_API_SIGNOUT}`);
-		fetchAction.setOption({ credentials: 'include' });
-		fetchAction.startFetch();
-	};
+	// send signout fetch after signout button is clicked
+	const { data } = useSWR(
+		isSigningOut ? `${SERVER_HOST}${AUTH_API_SIGNOUT}` : null,
+		fetcher
+	);
 
-	React.useEffect(() => {
-		if (fetchState.status === 'RECEIVED') Router.reload();
-	}, [fetchState, Router]);
+	// Refresh page after signing out successfully
+	if (data && data.authenticated === false) Router.reload();
 
 	return (
 		<div className={styles.dropdown}>
@@ -99,7 +106,7 @@ const UserOptions = () => {
 						</Link>
 					</li>
 					<li>
-						<button onClick={onButtonClick}>Sign Out</button>
+						<button onClick={() => setSigningOut(true)}>Sign Out</button>
 					</li>
 				</ul>
 			</div>

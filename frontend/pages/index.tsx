@@ -1,14 +1,13 @@
+// Functionality
+import { useRouter } from 'next/dist/client/router';
+import { useForm } from 'libs/hooks/useForm';
 // JSX imports
 import { Container, Row } from 'react-bootstrap';
-//
-// Hook & context imports
-import { useForm } from 'libs/hooks/useForm';
-//
-// Style imports
+// Style
 import styles from './index.module.scss';
-import { useRouter } from 'next/dist/client/router';
+// Type
 import { PlainObject } from 'libs/_types';
-//
+
 // -----------------------------MAIN COMPONENT-----------------------------
 //
 // Route: home page

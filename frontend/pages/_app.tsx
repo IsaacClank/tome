@@ -1,15 +1,15 @@
+// Functionality
 import React from 'react';
 import { AppProps } from 'next/app';
-// JSX imports
+// JSX
 import NavBar from 'components/navbar';
 import Head from 'next/head';
-
-import 'styles/globals.scss'; // Style imports
+// Style
+import 'styles/globals.scss';
 
 // Custom App componebnt
 const App = (props: AppProps) => {
 	// App has layout has a fixed navigation bar on top. Page content is rendered below.
-	// App use an Authentication context for checking authenticated state. Will possibly be replaced by a different solution
 	return (
 		<>
 			<Head key={1}>

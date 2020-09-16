@@ -1,14 +1,15 @@
 import { useEffect, useState } from 'react';
 
 interface IRenderOptions {
-	dest: () => JSX.Element;
-	alt?: () => JSX.Element;
-	load?: () => JSX.Element;
+	dest: () => JSX.Element | JSX.Element[];
+	alt?: () => JSX.Element | JSX.Element[];
+	load?: () => JSX.Element | JSX.Element[];
 }
 
-const useLoader = (condition: boolean, renders: IRenderOptions) => {
+// Hook providing loader logic for a component
+const useLoader = (condition: boolean | null, renders: IRenderOptions) => {
 	const [renderCondition, setRenderCondition] = useState(condition);
-	let renderedPage = <></>;
+	let renderedPage: any = <></>;
 	useEffect(() => {
 		setRenderCondition(condition);
 	}, [condition]);

@@ -26,11 +26,7 @@ interface QueryData {
 }
 
 export const searchBook = async (queryObj: QueryObject) => {
-	if (
-		!(queryObj.q || queryObj.author || queryObj.title) ||
-		!queryObj.maxResults ||
-		!queryObj.page
-	)
+	if (!(queryObj.q || queryObj.author || queryObj.title) || !queryObj.maxResults || !queryObj.page)
 		return Promise.reject(new ServerResponse(400, { error: 'MISSING QUERY CONDITION' }));
 
 	return fetch(constructFetchURl(queryObj))
@@ -48,17 +44,19 @@ export const searchBook = async (queryObj: QueryObject) => {
 const parseQueryResponse = async (data: any, queryObject: QueryObject): Promise<QueryData> => {
 	return {
 		page: queryObject.page,
-		items: data.items.map((item: any) => ({
-			id: item.id || '',
-			selfLink: item.selfLink || '',
-			title: item.volumeInfo.title,
-			subtitle: item.volumeInfo.subtitle || '',
-			authors: item.volumeInfo.authors || [''],
-			publishedDate: item.volumeInfo.publishedDate || '',
-			rating: item.volumeInfo.averageRating || '',
-			cover: item.volumeInfo.imageLinks ? item.volumeInfo.imageLinks.thumbnail : '',
-			description: item.volumeInfo.description || '',
-		})),
+		items: data.items
+			? data.items.map((item: any) => ({
+					id: item.id || '',
+					selfLink: item.selfLink || '',
+					title: item.volumeInfo.title,
+					subtitle: item.volumeInfo.subtitle || '',
+					authors: item.volumeInfo.authors || [''],
+					publishedDate: item.volumeInfo.publishedDate || '',
+					rating: item.volumeInfo.averageRating || '',
+					cover: item.volumeInfo.imageLinks ? item.volumeInfo.imageLinks.thumbnail : '',
+					description: item.volumeInfo.description || '',
+			  }))
+			: [],
 	};
 };
 

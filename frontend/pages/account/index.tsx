@@ -1,20 +1,21 @@
+// Functionality
 import React from 'react';
-
-// Hook & context imports
 import { useRouter } from 'next/dist/client/router';
-
-// Style imports
-import styles from './index.module.scss';
 import useAuth from 'libs/hooks/useAuth';
 import useLoader from 'libs/hooks/useLoader';
+// JSX
 import Loading from 'components/Loading';
+// Style
+import styles from './index.module.scss';
 //
 // ---------------------------------MAIN COMPONENT---------------------------------
 //
 // route: /account
 const Account = () => {
-	const { data } = useAuth();
-	const router = useRouter();
+	const { data } = useAuth(); // confirm auth state
+	const router = useRouter(); // router object
+
+	// Loader logic
 	const Page = useLoader(data?.authenticated, {
 		dest: () => (
 			<div id={styles.Content}>

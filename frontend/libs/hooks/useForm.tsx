@@ -38,16 +38,19 @@ export const useForm = (
 	onSubmit?: (formValues?: PlainObject) => void
 ): [JSX.Element, PlainObject] => {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	const [formValues, dispatch] = useReducer((state: PlainObject, action: { target: any }) => {
-		switch (action.target.type) {
-			case 'checkbox':
-				return { ...state, [action.target.id]: action.target.checked };
-			case 'radio':
-				return { ...state, [action.target.name]: action.target.value };
-			default:
-				return { ...state, [action.target.id]: action.target.value };
-		}
-	}, getFormValue(formTemplate));
+	const [formValues, dispatch] = useReducer(
+		(state: PlainObject, action: { target: any }) => {
+			switch (action.target.type) {
+				case 'checkbox':
+					return { ...state, [action.target.id]: action.target.checked };
+				case 'radio':
+					return { ...state, [action.target.name]: action.target.value };
+				default:
+					return { ...state, [action.target.id]: action.target.value };
+			}
+		},
+		getFormValue(formTemplate)
+	);
 
 	// submit handler
 	const submitHandler = (event: Event | any) => {
@@ -60,7 +63,12 @@ export const useForm = (
 		return dispatch({ target: event.target });
 	};
 
-	const Form = generateForm(formTemplate, formValues, changeHandler, submitHandler);
+	const Form = generateForm(
+		formTemplate,
+		formValues,
+		changeHandler,
+		submitHandler
+	);
 	return [Form, formValues];
 };
 //
@@ -161,7 +169,11 @@ const getFormValue = (fieldOption: FormTemplateOption): PlainObject => {
 };
 
 // Component for rendering basic form input
-const BasicInput = (props: { option: FormFieldOption; value: any; handleChange: any }) => {
+const BasicInput = (props: {
+	option: FormFieldOption;
+	value: any;
+	handleChange: any;
+}) => {
 	const option = props.option;
 	const formComponent = (
 		<>
@@ -201,7 +213,11 @@ const BasicInput = (props: { option: FormFieldOption; value: any; handleChange: 
 };
 
 // Component for rendering choose-many form input
-const CheckBoxInput = (props: { option: FormFieldOption; value: any; handleChange: any }) => {
+const CheckBoxInput = (props: {
+	option: FormFieldOption;
+	value: any;
+	handleChange: any;
+}) => {
 	const option = props.option;
 	return (
 		<div className={option.className}>
@@ -218,11 +234,17 @@ const CheckBoxInput = (props: { option: FormFieldOption; value: any; handleChang
 };
 
 // Component for rendering choose-one form input
-const RadioFormInput = (props: { option: FormFieldOption; value: any; handleChange: any }) => {
+const RadioFormInput = (props: {
+	option: FormFieldOption;
+	value: any;
+	handleChange: any;
+}) => {
 	const option = props.option;
 	return (
 		<div className={option.className}>
-			{option.label ? <label htmlFor={option.group}>{option.label}</label> : null}
+			{option.label ? (
+				<label htmlFor={option.group}>{option.label}</label>
+			) : null}
 			<div id={option.group}>
 				{option.choices?.map(choice => {
 					choice = choice as { label: string; value: string | number };
