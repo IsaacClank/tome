@@ -5,6 +5,7 @@ import LibROuter from './routes/lib';
 import SessionManager from './services/session';
 import { ServerResponse } from './_types';
 import Cors from './services/cors';
+import compression from 'compression';
 
 const App = express();
 
@@ -12,6 +13,7 @@ App.use(Cors);
 App.use(SessionManager);
 App.use(express.json());
 App.use(express.urlencoded({ extended: false }));
+App.use(compression());
 
 // Compile response
 App.use((_, res, next) => {
